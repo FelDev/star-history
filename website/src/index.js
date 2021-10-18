@@ -1,3 +1,4 @@
+import 'regenerator-runtime/runtime'
 import getStarHistory from '../../core/getStarHistory';
 import draw from './draw';
 import notie from 'notie'
@@ -21,7 +22,7 @@ async function getRepoNameFetchAndDraw() {
   let repo = ''
   let rawRepoStr = document.getElementById('repo').value;
   if (rawRepoStr.includes('github.com')) {
-    rawRepoStr += '\/'      // make sure url end with /
+    rawRepoStr += '\/' // make sure url end with /
     repo = /github.com\/(\S*?\/\S*?)[\/#?]/.exec(rawRepoStr)[1];
   } else {
     repo = rawRepoStr == '' ? 'timqian/star-history' : rawRepoStr;
@@ -29,7 +30,10 @@ async function getRepoNameFetchAndDraw() {
 
   for (let item of data) {
     if (item.label == repo) {
-      notie.alert({ text: 'This repo is already on the chart', type: 'warning' });
+      notie.alert({
+        text: 'This repo is already on the chart',
+        type: 'warning'
+      });
       return;
     }
   }
@@ -81,13 +85,19 @@ document.getElementById('clearBtn').addEventListener('click', () => {
 document.getElementById('shareBtn').addEventListener('click', (e) => {
   e.preventDefault();
   copyToClipboard(window.location.href);
-  notie.alert({text:'Url copied', type:'success'});
+  notie.alert({
+    text: 'Url copied',
+    type: 'success'
+  });
 })
 
 document.getElementById('CSVBtn').addEventListener('click', (e) => {
   e.preventDefault();
   downloadCSV();
-  notie.alert({text:'CSV Downloaded', type:'success'});
+  notie.alert({
+    text: 'CSV Downloaded',
+    type: 'success'
+  });
 })
 
 async function fetchDataAndDraw(repo, token) {
@@ -109,7 +119,7 @@ async function fetchDataAndDraw(repo, token) {
     });
     //fetch date and starhistory of last added repo into csvData array
     let dateTimeArr = data[data.length - 1]["data"];
-    for (let i = 0; i < dateTimeArr.length; ++i){
+    for (let i = 0; i < dateTimeArr.length; ++i) {
       let dateTime = []
       dateTime.push(repo);
       dateTime.push(dateTimeArr[i]['x'].toString());
@@ -117,30 +127,42 @@ async function fetchDataAndDraw(repo, token) {
       csvData.push(dateTime);
     }
     //convert csvData array into format suitable for CSV download
-    CSVContent = csvData.map(row => row.map(item => (typeof item === 'string' && item.indexOf(',') >= 0) ? `"${item}"`: String(item)).join(',')).join('\n');
+    CSVContent = csvData.map(row => row.map(item => (typeof item === 'string' && item.indexOf(',') >= 0) ? `"${item}"` : String(item)).join(',')).join('\n');
 
     draw(data);
 
     if (location.hash === '') {
       location.hash += repo;
-    } else if (location.hash.length >=3 && !location.hash.includes(repo)) { // minimal sample of repo name 'a/b'
+    } else if (location.hash.length >= 3 && !location.hash.includes(repo)) { // minimal sample of repo name 'a/b'
 
       location.hash += '&' + repo;
     }
   } catch (error) {
     console.dir(error);
     if (error.message === 'Repo has no star history') {
-      notie.alert({text:'This repo has no star history', type:'warning'})
+      notie.alert({
+        text: 'This repo has no star history',
+        type: 'warning'
+      })
     } else if (error.response.status === 403) {
-      notie.alert({ text: 'GitHub API rate limit exceeded', type:'warning' });
+      notie.alert({
+        text: 'GitHub API rate limit exceeded',
+        type: 'warning'
+      });
 
       setTimeout(() => {
         document.querySelector('.modal').classList.add('is-active');
       }, 2500);
     } else if (error.response.status === 404) {
-      notie.alert({text:'No such repo', type:'warning' })
+      notie.alert({
+        text: 'No such repo',
+        type: 'warning'
+      })
     } else {
-      notie.alert({text:'Some unexpected error happened, try again', type:'warning' })
+      notie.alert({
+        text: 'Some unexpected error happened, try again',
+        type: 'warning'
+      })
     }
   }
 
@@ -161,7 +183,7 @@ function drawAddTokenBtn(token) {
 
 // copy text to clipboard
 // ref: https://stackoverflow.com/a/46118025
-function copyToClipboard(text){
+function copyToClipboard(text) {
   var dummy = document.createElement("input");
   document.body.appendChild(dummy);
   dummy.setAttribute('value', text);
@@ -172,7 +194,7 @@ function copyToClipboard(text){
 
 // download CSV
 // ref: https://stackoverflow.com/questions/18848860/javascript-array-to-csv
-function downloadCSV(){
+function downloadCSV() {
   var encodedUri = encodeURI('data:text/csv;charset=utf-8,' + CSVContent);
   const link = document.createElement('a');
   link.setAttribute('href', encodedUri);
@@ -182,10 +204,10 @@ function downloadCSV(){
 
 // The following code is based off a toggle menu by @Bradcomp
 // source: https://gist.github.com/Bradcomp/a9ef2ef322a8e8017443b626208999c1
-(function() {
+(function () {
   var burger = document.querySelector('.burger');
-  var menu = document.querySelector('#'+burger.dataset.target);
-  burger.addEventListener('click', function() {
+  var menu = document.querySelector('#' + burger.dataset.target);
+  burger.addEventListener('click', function () {
     burger.classList.toggle('is-active');
     menu.classList.toggle('is-active');
   });
